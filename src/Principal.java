@@ -10,13 +10,15 @@ public class Principal {
         var cep = leitura.nextLine();
 
         try {
-            Endereco novoEndereco = consultaCep.buscaEndereco(cep);
+            Endereco novoEndereco = ConsultaCep.buscaEndereco(cep);
             System.out.println(novoEndereco);
             GeradorDeArquivo gerador = new GeradorDeArquivo();
             gerador.salvaJson(novoEndereco);
         } catch (RuntimeException | IOException e) {
             System.out.println(e.getMessage());
             System.out.println("Finalizando a aplicação");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }

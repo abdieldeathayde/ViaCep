@@ -1,28 +1,28 @@
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ConsultaCep {
+    public static Endereco buscaEndereco(String cep) throws Exception {
+        String url = "https://viacep.com.br/ws/" + cep + "/json/";
+        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+        con.setRequestMethod("GET");
 
-    public Endereco buscaEndereco(String cep) {
-        URI endereco = URI.create("https://viacep.com.br/ws/" + cep + "/json/");
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(endereco)
-                .build();
-
-        try {
-            HttpResponse<String> response = HttpClient
-                    .newHttpClient()
-                    .send(request, HttpResponse.BodyHandlers.ofString());
-            return new Gson().fromJson(response.body(), Endereco.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Não consegui obter o endereço a partir desse CEP.");
+        if (con.getResponseCode() != 200) {
+            throw new RuntimeException("Erro na requisição: " + con.getResponseCode());
         }
 
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        StringBuilder resposta = new StringBuilder();
+        String linha;
+        while ((linha = in.readLine()) != null) {
+            resposta.append(linha);
+        }
+        in.close();
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(resposta.toString(), Endereco.class);
     }
 }
