@@ -1,3 +1,5 @@
+package com.alura.buscacep;
+
 import java.io.IOException;
 import java.util.Scanner;
 
